@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
+using EquipmentRentalApplication.Services;
 
 namespace EquipmentRentalApplication
 {
@@ -33,6 +34,8 @@ namespace EquipmentRentalApplication
 
             services.AddDbContext<EquipmentContext>(options =>
                   options.UseSqlServer(Configuration.GetConnectionString("EquipmentRentalDatabase")));
+
+            services.AddScoped<ICartService, CartService>();
 
         }
 

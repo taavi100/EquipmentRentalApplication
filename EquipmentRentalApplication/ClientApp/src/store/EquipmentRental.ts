@@ -1,5 +1,6 @@
 import { Action, Reducer } from 'redux';
 import { AppThunkAction } from './';
+import { equal } from 'assert';
 
 // -----------------
 // STATE - This defines the type of data maintained in the Redux store.
@@ -41,12 +42,20 @@ interface ReceiveEquipmentsAction {
     equipments: Equipment[];
 }
 
+interface CartCheckoutAction {
+    type: 'CHECKOUT_CART';
+    cart: Cart;
+}
 
+interface UpdateDaysValue {
+    type: 'UPDATE_DAYS';
+    equipments: Equipment[];
+}
 
 
 // Declare a 'discriminated union' type. This guarantees that all references to 'type' properties contain one of the
 // declared type strings (and not any other arbitrary string).
-type KnownAction = RequestEquipmentAction | ReceiveEquipmentsAction;
+type KnownAction = RequestEquipmentAction | ReceiveEquipmentsAction | CartCheckoutAction | UpdateDaysValue;
 
 // ----------------
 // ACTION CREATORS - These are functions exposed to UI components that will trigger a state transition.
@@ -66,7 +75,38 @@ export const actionCreators = {
             dispatch({ type: 'REQUEST_EQUIPMENTS', startDateIndex: startDateIndex });
         }
     },
-    addToCart: (cart: Cart): AppThunkAction<KnownAction> => (dispatch, getState) => { }
+    addToCart: (): AppThunkAction<KnownAction> => (dispatch, getState) => {
+        const appState = getState();
+
+        if (appState && appState.equipmentRental) {
+            const cart: Cart = {
+                client: { customerId: 1 },
+                cartItem: appState.equipmentRental.equipments
+            };
+
+            const opts: RequestInit = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(cart)
+            };
+            fetch(`api/cart`, opts);
+        }
+    },
+    updateDaysToRent: (event: React.ChangeEvent<HTMLInputElement>): AppThunkAction<KnownAction> => (dispatch, getState) => {
+        event.persist();
+        const appState = getState();
+        if (appState && appState.equipmentRental) {
+            let value = Number(event.target.value);
+            let id = Number(event.target.id);
+            let equipments = appState.equipmentRental.equipments;
+            let equipment = equipments.find(item => item.equipmentId === id)
+            if (equipment) {
+                equipment.daysRent = value;
+            }
+            console.log(JSON.stringify(event.target.id));
+            dispatch({ type: 'UPDATE_DAYS', equipments });
+        }
+    }
 };
 
 // ----------------
@@ -91,11 +131,24 @@ export const reducer: Reducer<EquipmentRentalState> = (state: EquipmentRentalSta
             // Only accept the incoming data if it matches the most recent request. This ensures we correctly
             // handle out-of-order responses.
             if (action.startDateIndex === state.startDateIndex) {
+
                 return {
                     startDateIndex: action.startDateIndex,
                     equipments: action.equipments,
                     isLoading: false
                 };
+            };
+        case 'CHECKOUT_CART': return {
+            startDateIndex: state.startDateIndex,
+            equipments: state.equipments,
+            isLoading: false
+        };
+        case 'UPDATE_DAYS':
+            let test: Equipment[] = action.equipments;
+            return {
+                startDateIndex: state.startDateIndex,
+                equipments: action.equipments,
+                isLoading: false
             }
             break;
     }

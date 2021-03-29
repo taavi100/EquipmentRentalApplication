@@ -9,7 +9,7 @@ namespace EquipmentRentalApplication.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int LineItemId { get; set; }
         [ForeignKey("Equipment"), DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int EquipmetId { get; set; }
+        public int EquipmentId { get; set; }
         public virtual Equipment Equipment { get; set; }
 
         [ForeignKey("Invoice"), DatabaseGenerated(DatabaseGeneratedOption.None)]

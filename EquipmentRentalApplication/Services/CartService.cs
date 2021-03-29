@@ -20,12 +20,12 @@ namespace EquipmentRentalApplication.Services
         {
             var customer = await _context.Customers.FindAsync(cart.Client.CustomerId);
             
-            Invoice invoice = new Invoice { Customer = customer, Title = $"Invoice {customer.CustomerName}" };
+            Invoice invoice = new Invoice { Customer = customer, CustomerId = customer.CustomerId, Title = $"Invoice {customer.CustomerName}" };
+
             var items = cart.CartItem
-                .Select(item => new LineItem { Equipment = item.Equipment, DaysRent = item.DaysRent })
+                .Select(item => new LineItem { EquipmentId = item.EquipmentId, DaysRent = item.DaysRent })
+                .Where(item => item.DaysRent > 0)
                 .ToList();
-            customer.LoyaltyPoints += items
-                .Sum(item => item.Equipment.Type.LoyaltyPoints);
 
             invoice.OrderItem = items;
             await _context.Invoice.AddAsync(invoice);

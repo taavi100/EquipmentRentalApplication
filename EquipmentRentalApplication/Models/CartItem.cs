@@ -8,7 +8,11 @@ namespace EquipmentRentalApplication.Models
 {
     public class CartItem
     {
-        public Equipment Equipment { get; set; }
+        public int EquipmentId { get; set; }
+
+        public int EquipmentTypeId { get; set; }
+
+        public string EquipmentName { get; set; }
 
         [Range(0, 999)]
         public int DaysRent {get; set;}

@@ -22,7 +22,7 @@ namespace EquipmentRentalApplication.Dal
 
         public DbSet<Equipment> Equipments { get; set; }
         public DbSet<Customer> Customers { get; set; }
-        public DbSet<EquipmentRentalApplication.Models.Invoice> Invoice { get; set; }
+        public DbSet<Invoice> Invoice { get; set; }
 
     }
 }

@@ -54,7 +54,7 @@ class EquipmentData extends React.PureComponent<EquipmentRentalProps> {
           {this.props.equipments.map((equipments: EquipmentRentalStore.Equipment) =>
             <tr key={equipments.equipmentId}>
                   <td>{equipments.equipmentName}</td>
-                  <td><input value={equipments.daysRent}/></td>
+                  <td><input id={equipments.equipmentId.toString()} value={equipments.daysRent} onChange={(event) => this.props.updateDaysToRent(event)}/></td>
             </tr>
           )}
         </tbody>
