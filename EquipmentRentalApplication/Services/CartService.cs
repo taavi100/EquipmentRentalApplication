@@ -1,8 +1,11 @@
 ﻿using EquipmentRentalApplication.Dal;
 using EquipmentRentalApplication.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace EquipmentRentalApplication.Services
@@ -36,23 +39,27 @@ namespace EquipmentRentalApplication.Services
 
         public async Task<string> GetInvoiceAsync(Invoice invoice)
         {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("ee-EE");
             int bonusPoints = 0;
             decimal totalPrice = 0.0M;
 
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(invoice.Title);
-            sb.AppendLine(new string('_', 25));
+            sb.AppendLine(new string('_', 40));
 
             using (StringWriter sw = new StringWriter(sb))
             {
                 foreach (var item in invoice.OrderItem)
                 {
+
                     decimal itemPrice = item.Equipment.Type.CalculateRentalPrice((uint)item.DaysRent);
                     bonusPoints += item.Equipment.Type.LoyaltyPoints;
                     totalPrice += itemPrice;
-                    await sw.WriteAsync($"{item.Equipment.EquipmentName,10} {item.DaysRent,5} {itemPrice,10:C}");
+                    await sw.WriteLineAsync($"{item.Equipment.EquipmentName,25}{item.DaysRent,5}{itemPrice,10:C2}");
                 }
-                await sw.WriteAsync($"Total price: {totalPrice,10:C} Bonus points: {bonusPoints}");
+                await sw.WriteLineAsync(new string('_', 40));
+                await sw.WriteLineAsync($"Total price:   {totalPrice,25:C2}");
+                await sw.WriteLineAsync($"Bonus points:  {bonusPoints,25}");
             }
             
             return sb.ToString();

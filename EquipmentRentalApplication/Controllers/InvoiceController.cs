@@ -9,6 +9,7 @@ using EquipmentRentalApplication.Dal;
 using EquipmentRentalApplication.Models;
 using EquipmentRentalApplication.Services;
 using System.Text;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace EquipmentRentalApplication.Controllers
 {
@@ -36,15 +37,20 @@ namespace EquipmentRentalApplication.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult> GetInvoice(int id)
         {
-            var invoice = await _context.Invoice.FindAsync(id);
+            var invoice = await _context.Invoice
+                .Where(p => p.InvoiceId == id)
+                .Include("OrderItem.Equipment.Type")
+                .ToListAsync();
 
             if (invoice == null)
             {
                 return NotFound();
             }
 
-            byte[] byteArray = Encoding.UTF8.GetBytes(await _cartService.GetInvoiceAsync(invoice));
-            return new FileContentResult(byteArray, "application/octet-stream");
+            byte[] byteArray = Encoding.UTF8.GetBytes(await _cartService.GetInvoiceAsync(invoice.First()));
+            var file =  new FileContentResult(byteArray, "application/octet-stream");
+            file.FileDownloadName = $"Invoice_no_{id}.txt";
+            return file;
         }
 
         // PUT: api/Invoice/5

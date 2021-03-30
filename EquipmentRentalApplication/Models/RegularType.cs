@@ -15,7 +15,7 @@ namespace EquipmentRentalApplication.Models
 
         public override decimal CalculateRentalPrice(uint days) {
             //rental price is one-time rental fee plus premium fee for the first 2 days each plus regular fee for the number of days over 2
-            return Fee.OneTime + Fee.Premium * Math.Min(2, days) + Fee.Regular * Math.Max(0, days - 2);
+            return Fee.OneTime + Fee.Premium * Math.Min(2, days) + Fee.Regular * Math.Max(0, (int)days - 2);
         }
     }
 }

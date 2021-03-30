@@ -14,7 +14,7 @@ namespace EquipmentRentalApplication.Models
 
         public override decimal CalculateRentalPrice(uint days) {
             //rental price is premium fee for the first 3 days each plus regular fee times the number of days over 3
-            return Fee.Premium * Math.Min(3, days) + Fee.Regular * Math.Max(0, days - 3);
+            return Fee.Premium * Math.Min(3, days) + Fee.Regular * Math.Max(0, (int)days - 3);
         }
     }
 }
